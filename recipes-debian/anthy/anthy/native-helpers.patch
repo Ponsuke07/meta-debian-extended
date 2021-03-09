@@ -1,0 +1,53 @@
+upstream: not applicable
+author: pH5
+comment: Stage the native anthy helpers mkfiledic, mkdepgraph, mkworddic, 
+comment: calctrans and proccorpus.
+diff -uprN anthy-0.3.orig/calctrans/Makefile.am anthy-0.3/calctrans/Makefile.am
+--- anthy-0.3.orig/calctrans/Makefile.am	2021-03-09 10:05:58.119711246 +0900
++++ anthy-0.3/calctrans/Makefile.am	2021-03-09 10:07:42.743709623 +0900
+@@ -3,7 +3,7 @@
+ #  corpus.3.txt corpus.4.txt corpus.5.txt \
+ #  corpus_info weak_words
+ 
+-noinst_PROGRAMS = calctrans proccorpus
++bin_PROGRAMS = calctrans proccorpus
+ AM_CPPFLAGS = -I$(top_srcdir)/
+ 
+ calctrans_SOURCES = calctrans.c input_set.c input_set.h corpus.c
+diff -uprN anthy-0.3.orig/depgraph/Makefile.am anthy-0.3/depgraph/Makefile.am
+--- anthy-0.3.orig/depgraph/Makefile.am	2021-03-09 10:05:58.123711246 +0900
++++ anthy-0.3/depgraph/Makefile.am	2021-03-09 10:06:29.991710752 +0900
+@@ -7,7 +7,7 @@ CLEANFILES = anthy.dep all.depword
+ EXTRA_DIST = indepword-wt.txt $(DEPWORDS)
+ 
+ # Generate the dictionary
+-noinst_PROGRAMS = mkdepgraph
++bin_PROGRAMS = mkdepgraph
+ mkdepgraph_SOURCES = mkdepgraph.c
+ mkdepgraph_LDADD =  ../src-main/libanthy.la ../src-worddic/libanthydic.la
+ 
+diff -uprN anthy-0.3.orig/mkanthydic/Makefile.am anthy-0.3/mkanthydic/Makefile.am
+--- anthy-0.3.orig/mkanthydic/Makefile.am	2021-03-09 10:05:58.123711246 +0900
++++ anthy-0.3/mkanthydic/Makefile.am	2021-03-09 10:06:29.991710752 +0900
+@@ -2,7 +2,7 @@
+ noinst_SCRIPTS =
+ AM_CPPFLAGS = -I$(top_srcdir)/ -DSRCDIR=\"$(srcdir)\"
+ 
+-noinst_PROGRAMS = mkfiledic
++bin_PROGRAMS = mkfiledic
+ mkfiledic_SOURCES = mkfiledic.c
+ mkfiledic_LDADD = ../src-diclib/libdiclib.la
+ 
+diff -uprN anthy-0.3.orig/mkworddic/Makefile.am anthy-0.3/mkworddic/Makefile.am
+--- anthy-0.3.orig/mkworddic/Makefile.am	2021-03-09 10:05:58.131711246 +0900
++++ anthy-0.3/mkworddic/Makefile.am	2021-03-09 10:06:29.991710752 +0900
+@@ -25,7 +25,8 @@ DIC_FILES = @top_srcdir@/alt-cannadic/gc
+ 	    @top_srcdir@/mkworddic/udict
+ 
+ # Generate the dictionary
+-noinst_PROGRAMS = mkworddic
++#noinst_PROGRAMS = mkworddic
++bin_PROGRAMS = mkworddic
+ mkworddic_SOURCES = mkdic.c writewords.c mkudic.c calcfreq.c mkdic.h
+ mkworddic_LDADD = ../src-worddic/libanthydic.la
+ 

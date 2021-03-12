@@ -1,0 +1,107 @@
+--- ibus-anthy-1.5.9.orig/configure.ac	2016-10-20 12:12:33.000000000 +0900
++++ ibus-anthy-1.5.9/configure.ac	2018-08-03 16:03:53.284455889 +0900
+@@ -150,28 +150,6 @@
+ AM_CONDITIONAL([ENABLE_PYTHON2], [test x"$enable_python2" = x"yes"])
+ AM_CONDITIONAL([ENABLE_PYTHON3], [test x"$enable_python3" = x"yes"])
+ 
+-dnl - check the supported ibus version
+-AC_MSG_CHECKING([if your ibus version is supported])
+-IBUS_VERSION_TEST="
+-from gi.repository import IBus
+-def _ibus_check_version(v):
+-    major = IBus.MAJOR_VERSION
+-    minor = IBus.MINOR_VERSION
+-    micro = IBus.MICRO_VERSION
+-    if (major, minor, micro) < tuple(map(int, (v.split('.')))):
+-        raise ValueError('Required ibus %s but version of ibus is %d.%d.%d' % \
+-                         (v, major, minor, micro))
+-
+-_ibus_check_version('ibus_required_version')
+-exit(0)
+-"
+-$PYTHON -c "$IBUS_VERSION_TEST"
+-if test $? -eq 0; then
+-AC_MSG_RESULT([yes])
+-else
+-AC_MSG_ERROR([no])
+-fi
+-
+ dnl - engine-env
+ AC_MSG_CHECKING([what are the enviroments for ibus-engine-anthy])
+ AC_ARG_WITH(engine-env,
+@@ -313,74 +291,6 @@
+ fi
+ AC_SUBST(HOTKEYS_XML)
+ 
+-dnl - check symbol in IBus.EngineDesc
+-AC_MSG_CHECKING([if IBus.EngineDesc has get_symbol])
+-SYMBOL_CHAR='&#x3042;'
+-SYMBOL_CHAR_INT=0x3042
+-SYMBOL_TEST="from gi.repository import IBus
+-exit(not hasattr(IBus.EngineDesc, 'get_symbol'))
+-"
+-$PYTHON -c "$SYMBOL_TEST"
+-if test $? -eq 0; then
+-    SYMBOL_XML="<symbol>${SYMBOL_CHAR}</symbol>"
+-    AC_MSG_RESULT([yes])
+-else
+-    SYMBOL_XML="<!-- <symbol>${SYMBOL_CHAR}</symbol> -->"
+-    AC_MSG_ERROR([ibus 1.4 or later supports symbol in IBus.EngineDesc])
+-fi
+-AC_SUBST(SYMBOL_CHAR_INT)
+-AC_SUBST(SYMBOL_XML)
+-
+-dnl - check symbol in IBus.Property
+-AC_MSG_CHECKING([if IBus.Property has get_symbol])
+-SYMBOL_TEST="from gi.repository import IBus
+-exit(not hasattr(IBus.Property, 'get_symbol'))
+-"
+-$PYTHON -c "$SYMBOL_TEST"
+-if test $? -eq 0; then
+-    AC_MSG_RESULT([yes])
+-else
+-    AC_MSG_ERROR([ibus 1.5 or later supports symbol in IBus.Property])
+-fi
+-
+-dnl - check XKB option in IBus.EngineDesc
+-AC_MSG_CHECKING([if IBus.EngineDesc has get_layout_option])
+-LAYOUT_OPTION_TEST="from gi.repository import IBus
+-exit(not hasattr(IBus.EngineDesc, 'get_layout_option'))
+-"
+-$PYTHON -c "$LAYOUT_OPTION_TEST"
+-if test $? -eq 0; then
+-    AC_MSG_RESULT([yes])
+-else
+-    AC_MSG_ERROR([ibus 1.5 or later supports layout_option in IBus.EngineDesc])
+-fi
+-
+-AC_MSG_CHECKING([if IBus.EngineDesc has get_version])
+-DESC_VERSION_TEST="from gi.repository import IBus
+-exit(not hasattr(IBus.EngineDesc, 'get_version'))
+-"
+-$PYTHON -c "$DESC_VERSION_TEST"
+-if test $? -eq 0; then
+-    AC_MSG_RESULT([yes])
+-else
+-    AC_MSG_ERROR([ibus 1.5 or later supports version in IBus.EngineDesc])
+-fi
+-
+-dnl - check icon_prop_key in IBus.EngineDesc
+-AC_MSG_CHECKING([if IBus.EngineDesc has get_icon_prop_key])
+-ICON_PROP_KEY_TEST="from gi.repository import IBus
+-exit(not hasattr(IBus.EngineDesc, 'get_icon_prop_key'))
+-"
+-$PYTHON -c "$ICON_PROP_KEY_TEST"
+-if test $? -eq 0; then
+-    ICON_PROP_KEY_XML="<icon_prop_key>InputMode</icon_prop_key>"
+-    AC_MSG_RESULT([yes])
+-else
+-    ICON_PROP_KEY_XML="<!-- <icon_prop_key>InputMode</icon_prop_key> -->"
+-    AC_MSG_RESULT([ibus 1.5.11 or later supports icon-prop-key in IBus.EngineDesc])
+-fi
+-AC_SUBST(ICON_PROP_KEY_XML)
+-
+ dnl - set ibus-anthy layout
+ AC_ARG_WITH(layout,
+            [AC_HELP_STRING([--with-layout=LAYOUT],
+

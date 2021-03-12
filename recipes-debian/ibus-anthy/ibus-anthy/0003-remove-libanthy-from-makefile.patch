@@ -1,0 +1,11 @@
+--- ibus-anthy-1.5.9.orig/gir/Makefile.am	2016-10-20 12:12:28.000000000 +0900
++++ ibus-anthy-1.5.9/gir/Makefile.am	2018-08-03 16:11:58.418216020 +0900
+@@ -68,7 +68,7 @@
+ 	--warn-all \
+ 	$(NULL)
+ Anthy_9000_gir_INCLUDES = GObject-2.0
+-Anthy_9000_gir_LIBS = $(libanthygobject) anthy
++Anthy_9000_gir_LIBS = $(libanthygobject)
+ Anthy_9000_gir_CFLAGS = @ANTHY_CFLAGS@
+ Anthy_9000_gir_FILES = \
+ 	$(libanthygobject_1_0_la_SOURCES) \

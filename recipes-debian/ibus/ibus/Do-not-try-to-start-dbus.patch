@@ -1,0 +1,32 @@
+--- ibus-1.5.19/data/dconf/make-dconf-override-db.sh.org	2021-03-08 16:59:14.772667171 +0900
++++ ibus-1.5.19/data/dconf/make-dconf-override-db.sh	2021-03-08 17:00:25.252666077 +0900
+@@ -2,6 +2,10 @@
+
+ set -e
+
++# gnome-continuous doesn't have a machine-id set, which
++# breaks dbus-launch.  There's dbus-run-session which is
++# better, but not everyone has it yet.
++export DBUS_FATAL_WARNINGS=0
+ export TMPDIR=$(mktemp -d --tmpdir="$PWD")
+ export XDG_CONFIG_HOME="$TMPDIR/config"
+ export XDG_CACHE_HOME="$TMPDIR/cache"
+@@ -12,7 +16,7 @@ mkdir -p $XDG_CONFIG_HOME $XDG_CACHE_HOM
+ trap 'rm -rf $TMPDIR' ERR
+
+ # in case that schema is not installed on the system
+-dbus-run-session -- glib-compile-schemas --targetdir "$GSETTINGS_SCHEMA_DIR" "$PWD"
++glib-compile-schemas --targetdir "$GSETTINGS_SCHEMA_DIR" "$PWD"
+
+ cat <<EOF
+ # This file is a part of the IBus packaging and should not be changed.
+@@ -29,7 +33,7 @@ EOF
+ schemas="org.freedesktop.ibus.general org.freedesktop.ibus.panel"
+ current_schema=
+ for schema in $schemas; do
+-  dbus-run-session -- gsettings list-recursively $schema | \
++  gsettings list-recursively $schema | \
+   while read schema key val; do
+     if test "$schema" != "$current_schema"; then
+       echo
+

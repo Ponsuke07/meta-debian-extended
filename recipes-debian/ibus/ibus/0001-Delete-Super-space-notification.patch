@@ -1,0 +1,153 @@
+From fe19da157e2248545946c416e6f05072549e932b Mon Sep 17 00:00:00 2001
+From: Daisuke Yamane <yamane07ynct@gmail.com>
+Date: Mon, 8 Mar 2021 20:09:06 +0900
+Subject: [PATCH] Delete Super-space notification
+
+I'd assume most IBus 1.5.2 users are migrated to the latest 1.5.z now
+but the notification dialog gives much attention and could be deprecated.
+
+BUG=https://github.com/ibus/ibus/issues/2080
+---
+ configure.ac        | 20 ++------------------
+ ui/gtk3/Makefile.am | 19 ++-----------------
+ ui/gtk3/panel.vala  | 29 +----------------------------
+ 3 files changed, 5 insertions(+), 63 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 091e20f2..51bac4ce 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -3,8 +3,8 @@
+ # ibus - The Input Bus
+ #
+ # Copyright (c) 2007-2016 Peng Huang <shawn.p.huang@gmail.com>
+-# Copyright (c) 2015-2018 Takao Fujiwara <takao.fujiwara1@gmail.com>
+-# Copyright (c) 2007-2018 Red Hat, Inc.
++# Copyright (c) 2015-2019 Takao Fujiwara <takao.fujiwara1@gmail.com>
++# Copyright (c) 2007-2019 Red Hat, Inc.
+ #
+ # This library is free software; you can redistribute it and/or
+ # modify it under the terms of the GNU Lesser General Public
+@@ -606,21 +606,6 @@ if test x"$enable_engine" = x"yes"; then
+     enable_engine="yes (enabled, use --disable-engine to disable)"
+ fi
+ 
+-# --disable-libnotify
+-AC_ARG_ENABLE(libnotify,
+-    AS_HELP_STRING([--disable-libnotify],
+-                   [Disable to link libnotify]),
+-    [enable_libnotify=$enableval],
+-    [enable_libnotify=yes]
+-)
+-AM_CONDITIONAL([ENABLE_LIBNOTIFY], [test x"$enable_libnotify" = x"yes"])
+-if test x"$enable_libnotify" = x"yes"; then
+-    PKG_CHECK_MODULES(LIBNOTIFY, [
+-        libnotify >= 0.7
+-    ])
+-    enable_libnotify="yes (enabled, use --disable-libnotify to disable)"
+-fi
+-
+ PKG_CHECK_MODULES(XTEST,
+     [x11 xtst],
+     [enable_xtest=yes],
+@@ -801,7 +786,6 @@ Build options:
+   No snooper regexes            "$NO_SNOOPER_APPS"
+   Panel icon                    "$IBUS_ICON_KEYBOARD"
+   Enable surrounding-text       $enable_surrounding_text
+-  Enable libnotify              $enable_libnotify
+   Enable Emoji dict             $enable_emoji_dict
+   Unicode Emoji directory       $UNICODE_EMOJI_DIR
+   CLDR annotation directory     $EMOJI_ANNOTATION_DIR
+diff --git a/ui/gtk3/Makefile.am b/ui/gtk3/Makefile.am
+index aaba7a4d..292f6ce5 100644
+--- a/ui/gtk3/Makefile.am
++++ b/ui/gtk3/Makefile.am
+@@ -3,8 +3,8 @@
+ # ibus - The Input Bus
+ #
+ # Copyright (c) 2007-2015 Peng Huang <shawn.p.huang@gmail.com>
+-# Copyright (c) 2015-2018 Takao Fujwiara <takao.fujiwara1@gmail.com>
+-# Copyright (c) 2007-2018 Red Hat, Inc.
++# Copyright (c) 2015-2019 Takao Fujwiara <takao.fujiwara1@gmail.com>
++# Copyright (c) 2007-2019 Red Hat, Inc.
+ #
+ # This library is free software; you can redistribute it and/or
+ # modify it under the terms of the GNU Lesser General Public
+@@ -82,21 +82,6 @@ AM_VALAFLAGS = \
+ 	--target-glib="$(VALA_TARGET_GLIB_VERSION)" \
+ 	$(NULL)
+ 
+-if ENABLE_LIBNOTIFY
+-AM_CFLAGS += \
+-	@LIBNOTIFY_CFLAGS@ \
+-	$(NULL)
+-
+-AM_LDADD += \
+-	@LIBNOTIFY_LIBS@ \
+-	$(NULL)
+-
+-AM_VALAFLAGS += \
+-	--pkg=libnotify \
+-	-D ENABLE_LIBNOTIFY \
+-	$(NULL)
+-endif
+-
+ if ENABLE_APPINDICATOR
+ AM_VALAFLAGS += --define=INDICATOR
+ endif
+diff --git a/ui/gtk3/panel.vala b/ui/gtk3/panel.vala
+index 9bb3c806..2054658e 100644
+--- a/ui/gtk3/panel.vala
++++ b/ui/gtk3/panel.vala
+@@ -3,7 +3,7 @@
+  * ibus - The Input Bus
+  *
+  * Copyright(c) 2011-2014 Peng Huang <shawn.p.huang@gmail.com>
+- * Copyright(c) 2015-2018 Takao Fujwiara <takao.fujiwara1@gmail.com>
++ * Copyright(c) 2015-2019 Takao Fujwiara <takao.fujiwara1@gmail.com>
+  *
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+@@ -700,29 +700,6 @@ class Panel : IBus.PanelService {
+         return -1;
+     }
+ 
+-    private void update_version_1_5_3() {
+-#if ENABLE_LIBNOTIFY
+-        if (!Notify.is_initted()) {
+-            Notify.init ("ibus");
+-        }
+-
+-        var notification = new Notify.Notification(
+-                _("IBus Update"),
+-                _("Super+space is now the default hotkey."),
+-                "ibus");
+-        notification.set_timeout(30 * 1000);
+-        notification.set_category("hotkey");
+-
+-        try {
+-            notification.show();
+-        } catch (GLib.Error e){
+-            warning ("Notification is failed for IBus 1.5.3: %s", e.message);
+-        }
+-#else
+-        warning(_("Super+space is now the default hotkey."));
+-#endif
+-    }
+-
+     private void update_version_1_5_8() {
+         inited_engines_order = false;
+     }
+@@ -731,10 +708,6 @@ class Panel : IBus.PanelService {
+         string prev_version = m_settings_general.get_string("version");
+         string current_version = null;
+ 
+-        if (compare_versions(prev_version, "1.5.3") < 0)
+-       if (prev_version != "" && compare_versions(prev_version, "1.5.3") < 0)
+-            update_version_1_5_3();
+-
+         if (compare_versions(prev_version, "1.5.8") < 0)
+             update_version_1_5_8();
+ 
+-- 
+2.17.1
